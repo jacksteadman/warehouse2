@@ -9,7 +9,6 @@ class Tools {
     private $db_service;
     private $tx_factory;
 
-    private $db_name;
     private $table_name;
     private $pk_name;
 
@@ -20,17 +19,13 @@ class Tools {
 
     private $extra_data = array();
 
-    private $table_transform;
-
-
 
     public function __construct(ClientDb\Service $db_service) {
         $this->db_service = $db_service;
         $this->tx_factory = new Transforms\Factory();
     }
 
-    public function configure($db_name, $table_name, $pk_name, $extract_file_prefix) {
-        $this->db_name = $db_name;
+    public function configure($table_name, $pk_name, $extract_file_prefix) {
         $this->table_name = $table_name;
         $this->pk_name = $pk_name;
         $this->extract_file_prefix = $extract_file_prefix;
