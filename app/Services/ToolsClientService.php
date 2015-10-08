@@ -2,30 +2,20 @@
 
 namespace App\Services;
 
+use Exception;
 use App\Contracts\ToolsClient;
 
 class ToolsClientService implements ToolsClient\Service {
 
+    private static $bundle_cache = [];
+
+    public function getClientId($client_slug) {
+        $bundle = $this->loadBundle($client_slug);
+        return $bundle['client_id'];
+    }
+
     public function getPdoConnection($client_slug) {
-        // TODO: put path and bundle name in configs
-        $bundle_file = '/etc/bluestate/bundles/' . $client_slug . '/masterdb.json';
-        if (!file_exists($bundle_file)) {
-            throw new Exception('Bundle ' . $bundle_file . ' does not exist.');
-        }
-
-        $bundle_json = file_get_contents($bundle_file);
-        if ($bundle_json === false) {
-            throw new Exception('Bundle ' . $bundle_file . ' is empty or could not be read.');
-        }
-
-        $bundle = json_decode($bundle_json, true);
-        if (is_null($bundle)) {
-            throw new Exception('Bundle ' . $bundle_file . ' did not contain valid json.');
-        }
-
-        if (!$this->isValidBundle($bundle)) {
-            throw new Exception('Bundle ' . $bundle_file . ' does not appear to be a valid database config bundle.');
-        }
+        $bundle = $this->loadBundle($client_slug);
 
         // this transformation is done elsewhere in places like access_client_db
         $host = str_replace('fwork-master', 'fwork-reporting', $bundle['db_host']);
@@ -53,6 +43,34 @@ class ToolsClientService implements ToolsClient\Service {
         } catch (Exception $e) {
             throw new Exception("Failed connecting to client DB $client_slug: " . $e);
         }
+    }
+
+    private function loadBundle($client_slug) {
+        if (!empty(self::$bundle_cache[$client_slug])) {
+            return self::$bundle_cache[$client_slug];
+        }
+
+        $bundle_file = config('warehouse.tools_bundle_root') . '/' . $client_slug . '/' . config('warehouse.tools_bundle_name');
+        if (!file_exists($bundle_file)) {
+            throw new Exception('Bundle ' . $bundle_file . ' does not exist.');
+        }
+
+        $bundle_json = file_get_contents($bundle_file);
+        if ($bundle_json === false) {
+            throw new Exception('Bundle ' . $bundle_file . ' is empty or could not be read.');
+        }
+
+        $bundle = json_decode($bundle_json, true);
+        if (is_null($bundle)) {
+            throw new Exception('Bundle ' . $bundle_file . ' did not contain valid json.');
+        }
+
+        if (!$this->isValidBundle($bundle)) {
+            throw new Exception('Bundle ' . $bundle_file . ' does not appear to be a valid database config bundle.');
+        }
+
+        self::$bundle_cache[$client_slug] = $bundle;
+        return $bundle;
     }
 
     private function isValidBundle($bundle) {

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Extracts;
+use App\Contracts\ToolsClient;
 
 class ExtractTools extends Command
 {
@@ -12,7 +13,7 @@ class ExtractTools extends Command
      *
      * @var string
      */
-    protected $signature = 'warehouse:extract-tools {--client=} {--table=} {--pk=} {--file-prefix=} {--quiet}';
+    protected $signature = 'warehouse:extract-tools {--client=} {--table=} {--pk=} {--file-prefix=}';
 
     /**
      * The console command description.
@@ -27,14 +28,20 @@ class ExtractTools extends Command
     private $extractor;
 
     /**
+     * @var ToolsClient\Service
+     */
+    private $client_service;
+
+    /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(Extracts\Tools $extractor)
+    public function __construct(Extracts\Tools $extractor, ToolsClient\Service $client_service)
     {
         parent::__construct();
         $this->extractor = $extractor;
+        $this->client_service = $client_service;
     }
 
     /**
@@ -69,11 +76,15 @@ class ExtractTools extends Command
         $this->extractor->configure($client, $table, $pk, $prefix);
 
         // get and add client ID as fixture data
+        $client_id = $this->client_service->getClientId($client);
+        $this->extractor->addFixtureData('client_id', $client_id);
 
         if (!$this->option('quiet')) {
             $progress_bar = $this->output->createProgressBar(100);
             $this->extractor->setProgressBar($progress_bar);
         }
+
+        $this->info('made it this far');
 
 
 

@@ -23,8 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('App\Contracts\ClientDb\Service', function($app) {
-            return $app->make('App\Services\ClientDbService');
+        $this->app->singleton('App\Contracts\ToolsClient\Service', function($app) {
+            return $app->make('App\Services\ToolsClientService');
         });
     }
 }
