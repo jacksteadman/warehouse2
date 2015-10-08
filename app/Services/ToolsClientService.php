@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Contracts\ClientDb;
+use App\Contracts\ToolsClient;
 
-class ClientDbService implements ClientDb\Service {
+class ToolsClientService implements ToolsClient\Service {
 
     public function getPdoConnection($client_slug) {
         // TODO: put path and bundle name in configs
@@ -27,6 +27,7 @@ class ClientDbService implements ClientDb\Service {
             throw new Exception('Bundle ' . $bundle_file . ' does not appear to be a valid database config bundle.');
         }
 
+        // this transformation is done elsewhere in places like access_client_db
         $host = str_replace('fwork-master', 'fwork-reporting', $bundle['db_host']);
 
         $conn_options = array();

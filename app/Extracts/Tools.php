@@ -2,7 +2,7 @@
 
 namespace App\Extracts;
 
-use App\Contracts\ClientDb;
+use App\Contracts\ToolsClient;
 use App\Transforms;
 
 class Tools {
@@ -27,7 +27,7 @@ class Tools {
     private $fixture_data = array();
 
 
-    public function __construct(ClientDb\Service $db_service) {
+    public function __construct(ToolsClient\Service $db_service) {
         $this->db_service = $db_service;
         $this->tx_factory = new Transforms\Factory();
     }
