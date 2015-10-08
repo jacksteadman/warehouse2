@@ -22,6 +22,8 @@ class Tools {
     private $file_size_check_interval = 10000;
     private $file_size_limit = 1000000000;         // 1GB uncompressed
 
+    private $progress_bar;
+
     private $fixture_data = array();
 
 
@@ -43,6 +45,10 @@ class Tools {
 
     public function setFileSizeLimit($limit) {
         $this->file_size_limit = $limit;
+    }
+
+    public function setProgressBar($pb) {
+        $this->progress_bar = $pb;
     }
 
     public function addFixtureData($field, $value) {
@@ -76,6 +82,9 @@ class Tools {
 
         list($min_id, $max_id) = $this->getMinMaxIds($conn);
 
+        // crude approximation of record count
+        $total_records = $max_id - $min_id + 1;
+
         $file_index = 0;
         $current_file = $this->extract_file_prefix . '.' . $file_index;
 
@@ -83,6 +92,7 @@ class Tools {
         // TODO errors
 
         $processed = 0;
+        $current_percentile = 0;
 
         for ($i = $min_id; $i <= $max_id; $i += $this->record_batch_size) {
             if (($processed % $this->file_size_check_interval)) {
@@ -107,6 +117,12 @@ class Tools {
             }
 
             $processed++;
+
+            $percentile = floor($processed / $total_records * 100);
+            if ($this->progress_bar && $percentile > $current_percentile) {
+                $this->progress_bar->advance();
+                $current_percentile = $percentile;
+            }
         }
     }
 }
