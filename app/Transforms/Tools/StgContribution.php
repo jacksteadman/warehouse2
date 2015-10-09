@@ -199,4 +199,14 @@ class StgContribution {
         $string = substr($string, 0, 500);
         return $string;
     }
+
+    private function filterTimestamp($ts) {
+
+    }
+
+    private function filterDate($date) {
+
+    }
+
+
 }
