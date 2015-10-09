@@ -2,6 +2,8 @@
 
 namespace App\Extracts;
 
+use PDO;
+
 class TableIterator {
 
     private $sql;
@@ -9,7 +11,7 @@ class TableIterator {
 
     private $sth;
 
-    public function connection($conn) {
+    public function conn(PDO $conn) {
         $this->conn = $conn;
     }
 

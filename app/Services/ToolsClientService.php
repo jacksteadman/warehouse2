@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Exception;
+use PDO;
 use App\Contracts\ToolsClient;
 
 class ToolsClientService implements ToolsClient\Service {

@@ -91,10 +91,12 @@ class Tools {
         $fp = fopen($current_file, 'w');
         // TODO errors
 
+        $start_id = $min_id;
+
         $processed = 0;
         $current_percentile = 0;
 
-        for ($i = $min_id; $i <= $max_id; $i += $this->record_batch_size) {
+        do {
             if (($processed % $this->file_size_check_interval)) {
                 clearstatcache();
                 $size = filesize($current_file);
@@ -109,20 +111,24 @@ class Tools {
                 }
             }
 
-            $iterator->nextBatch($min_id, $min_id + $this->record_batch_size - 1);
+            $iterator->nextBatch($start_id, $start_id + $this->record_batch_size - 1);
+            $start_id = $start_id + $this->record_batch_size;
 
             while ($record = $iterator->nextRecord()) {
                 $tx_record = $transform->transform($record);
                 $this->writeRecord($fp, $tx_record);
-            }
 
-            $processed++;
+                $processed++;
 
-            $percentile = floor($processed / $total_records * 100);
-            if ($this->progress_bar && $percentile > $current_percentile) {
-                $this->progress_bar->advance();
-                $current_percentile = $percentile;
+                $percentile = floor($processed / $total_records * 100);
+                if ($this->progress_bar && $percentile > $current_percentile) {
+                    $this->progress_bar->advance();
+                    $current_percentile = $percentile;
+                }
             }
-        }
+        } while ($start_id <= $max_id);
+
+        fclose($fp);
+        if ($this->progress_bar) $this->progress_bar->finish();
     }
 }

@@ -190,9 +190,13 @@ class StgContribution {
 
             $tx_record[] = $value;
         }
+
+        return $tx_record;
     }
 
     private function filterString($string) {
+        $string = str_replace("\n", '\n', $string);
+        $string = substr($string, 0, 500);
         return $string;
     }
 }

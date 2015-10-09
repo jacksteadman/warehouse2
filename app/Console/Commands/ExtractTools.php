@@ -84,12 +84,6 @@ class ExtractTools extends Command
             $this->extractor->setProgressBar($progress_bar);
         }
 
-        $this->info('made it this far');
-
-
-
-        // extract
-
-
+        $this->extractor->extractAll();
     }
 }
