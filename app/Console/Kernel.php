@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         \App\Console\Commands\Inspire::class,
         \App\Console\Commands\ExtractTools::class,
+        \App\Console\Commands\MakeStagingTableFromTools::class,
     ];
 
     /**
