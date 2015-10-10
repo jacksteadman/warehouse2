@@ -16,11 +16,10 @@ class SqlService {
             ;
         }
 
-        $ddl = 'CREATE TABLE ' . $table_name . " (\n"
+        $ddl = 'CREATE TABLE staging.' . $table_name . " (\n"
             . '    client_id integer not null,' . "\n"
-            . '    ' . join(",\n    ", $field_list_ddl)
-            . ")\n"
-            . 'PRIMARY KEY (client_id, ' . $pk_name . ")\n"
+            . '    ' . join(",\n    ", $field_list_ddl) . ",\n"
+            . '    PRIMARY KEY (client_id, ' . $pk_name . ")\n)\n"
             . 'DISTSTYLE KEY' . "\n"
             . 'DISTKEY (client_id)' . "\n"
         ;
@@ -56,7 +55,7 @@ class SqlService {
                 break;
             case 'decimal':
             case 'numeric':
-                $pg_type['data_type'] = 'decimal(' . $matches['size'] . ')';
+                $pg_type['data_type'] = 'decimal' . $matches['size'];
                 break;
             case 'char':
             case 'varchar':
