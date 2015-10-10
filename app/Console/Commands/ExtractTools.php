@@ -82,8 +82,12 @@ class ExtractTools extends Command
         if (!$this->option('quiet')) {
             $progress_bar = $this->output->createProgressBar(100);
             $this->extractor->setProgressBar($progress_bar);
+
+            $this->info('Extracting ' . $table . ' from tools client ' . $client . ' to files at ' . $prefix . '.');
         }
 
         $this->extractor->extractAll();
+
+        if (!$this->option('quiet')) $this->info("\n");
     }
 }

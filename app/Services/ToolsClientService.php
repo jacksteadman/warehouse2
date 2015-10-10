@@ -15,6 +15,16 @@ class ToolsClientService implements ToolsClient\Service {
         return $bundle['client_id'];
     }
 
+    public function getCharset($client_slug) {
+        $bundle = $this->loadBundle($client_slug);
+        return $bundle['default_charset'];
+    }
+
+    public function getTimezone($client_slug) {
+        $bundle = $this->loadBundle($client_slug);
+        return $bundle['system_timezone'];
+    }
+
     public function getPdoConnection($client_slug) {
         $bundle = $this->loadBundle($client_slug);
 

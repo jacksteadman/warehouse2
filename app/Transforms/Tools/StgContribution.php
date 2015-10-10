@@ -2,7 +2,15 @@
 
 namespace App\Transforms\Tools;
 
+use DateTime, DateTimeZone;
+
 class StgContribution {
+    private $source_charset = 'utf-8';
+    private $source_timezone = 'UTC';
+
+    private $target_charset = 'utf-8';
+    private $target_timezone = 'UTC';
+
     private $fixture_data = [];
 
     private $output_format = [
@@ -158,14 +166,34 @@ class StgContribution {
         'custom3' => [ 'filterString' ],
         'custom_country_field_1' => [ 'filterString' ],
         'custom_country_field_2' => [ 'filterString' ],
-        'charge_dt' => [ 'filterString' ],
+        'cybersource_decision_dt' => [ 'filterDateTime' ],
+        'charge_dt' => [ 'filterDateTime' ],
+        'create_dt' => [ 'filterDateTime' ],
         'create_app' => [ 'filterString' ],
         'create_user' => [ 'filterString' ],
         'create_user_agent' => [ 'filterString' ],
+        'modified_dt' => [ 'filterDateTime' ],
         'modified_app' => [ 'filterString' ],
         'modified_user' => [ 'filterString' ],
         'note' => [ 'filterString' ],
     ];
+
+    public function __construct() {
+        $this->source_timezone = new DateTimeZone($this->source_timezone);
+        $this->target_timezone = new DateTimeZone($this->target_timezone);
+    }
+
+    public function setSourceTimezone($tz) {
+        $this->source_timezone = new DateTimeZone($tz);
+    }
+
+    public function setTargetTimezone($tz) {
+        $this->target_timezone = new DateTimeZone($tz);
+    }
+
+    public function setSourceCharset($charset) {
+        $this->source_charset = $charset;
+    }
 
     public function setFixtureData($data) {
         $this->fixture_data = $data;
@@ -195,18 +223,24 @@ class StgContribution {
     }
 
     private function filterString($string) {
+        // TODO multibyte
         $string = str_replace("\n", '\n', $string);
         $string = substr($string, 0, 500);
         return $string;
     }
 
-    private function filterTimestamp($ts) {
+    private function filterDateTime($ts) {
+        if ($ts == '0000-00-00 00:00:00') {
+            return '1970-01-01 00:00:00';
+        }
 
+        if (is_numeric($ts)) {
+            $dt = DateTime::createFromFormat('U', $ts, $this->source_timezone);
+        } else {
+            $dt = new DateTime($ts, $this->source_timezone);
+        }
+
+        $dt->setTimezone($this->target_timezone);
+        return $dt->format('Y-m-d H:i:s');
     }
-
-    private function filterDate($date) {
-
-    }
-
-
 }

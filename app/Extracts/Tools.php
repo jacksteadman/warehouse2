@@ -26,7 +26,6 @@ class Tools {
 
     private $fixture_data = array();
 
-
     public function __construct(ToolsClient\Service $db_service) {
         $this->db_service = $db_service;
         $this->tx_factory = new Transforms\Factory();
@@ -71,6 +70,8 @@ class Tools {
     public function extractAll() {
         $transform = $this->tx_factory->make(self::REALM, $this->table_name);
         $transform->setFixtureData($this->fixture_data);
+        $transform->setSourceCharset($this->db_service->getCharset($this->client_slug));
+        $transform->setSourceTimezone($this->db_service->getTimezone($this->client_slug));
 
         $iterator = new TableIterator();
 
